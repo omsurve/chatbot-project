@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Admission Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 400px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      background: #4CAF50;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .chat-box {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      background: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-bubble {
+      max-width: 70%;
+      padding: 10px;
+      border-radius: 20px;
+      margin: 5px 0;
+      word-wrap: break-word;
+    }
+
+    .user {
+      background: #4CAF50;
+      color: white;
+      align-self: flex-end;
+    }
+
+    .bot {
+      background: #e4e4e4;
+      color: black;
+      align-self: flex-start;
+    }
+
+    .chat-input {
+      display: flex;
+      border-top: 1px solid #ddd;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      outline: none;
+    }
+
+    .chat-input button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin-left: 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .chat-input button:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">College Admission Chatbot</div>
+
+    <div id="chat-box" class="chat-box">
+      <!-- Chat bubbles will appear here -->
+    </div>
+
+    <div class="chat-input">
+      <input type="text" id="user-input" placeholder="Type your query here...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById("chat-box");
+
+    // Function to send a message
+    function sendMessage() {
+      const userInput = document.getElementById("user-input");
+      const message = userInput.value.trim();
+
+      if (message) {
+        // Append user message
+        appendMessage(message, "user");
+
+        // Clear input field
+        userInput.value = "";
+
+        // Simulate bot response
+        setTimeout(() => {
+          const response = getBotResponse(message);
+          appendMessage(response, "bot");
+        }, 500);
+      }
+    }
+
+    // Function to append a message to the chat
+    function appendMessage(message, sender) {
+      const bubble = document.createElement("div");
+      bubble.className = `chat-bubble ${sender}`;
+      bubble.innerText = message;
+      chatBox.appendChild(bubble);
+
+      // Scroll to the latest message
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Function to get a bot response (static for now)
+    function getBotResponse(message) {
+      const responses = {
+        "admission process": "You can apply online or visit the college office for assistance.",
+        "courses offered": "We offer undergraduate and postgraduate courses in various disciplines.",
+        "fees": "The fee structure varies based on the course. Please specify your interest.",
+        "eligibility": "Eligibility depends on the program. For undergraduate courses, 10+2 is required. For postgraduate courses, a bachelor's degree is needed.",
+        "contact": "You can reach us at +91-9876543210 or email us at admissions@college.edu."
+      };
+
+      return responses[message.toLowerCase()] || "Sorry, I didn't understand that. Can you rephrase?";
+    }
+  </script>
+</body>
+</html>
