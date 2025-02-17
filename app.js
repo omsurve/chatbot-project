@@ -4,6 +4,7 @@ const app = express();
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser'); // Import body-parser if installed
+const seed = require('./utils/seed');
 
 
 const chatRoutes = require('./routes/chat');

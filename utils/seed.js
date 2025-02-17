@@ -1,15 +1,48 @@
 const mongoose = require('mongoose');
 const FAQ = require('../models/faq');
-mongoose.connect('mongodb://127.0.0.1:27017/chatbot');
+const Question = require('../models/Question.js');
 
-const seedFAQs = async () => {
-  await FAQ.deleteMany({});
-  await FAQ.create([
-    { question: 'What is the admission fee?', answer: '$500 per semester.' },
-    { question: 'How to apply?', answer: 'Visit the college website and fill the form.' },
-  ]);
-  console.log('FAQs seeded');
+// mongoose.connect('mongodb://127.0.0.1:27017/chatbot');
+mongoose.connect('mongodb://localhost:27017/chatbotDB', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+const seedQuestions = async () => {
+  await Question.deleteMany(); // Clears old data
+
+  const q1 = await Question.create({
+    questionText: "Welcome to the chatbot! What do you need help with?",
+    options: [
+      { text: "Admission Process", nextQuestionId: null },
+      { text: "Course Details", nextQuestionId: null },
+      { text: "Fees Structure", nextQuestionId: null },
+    ]
+  });
+  const q2 = await Question.create({
+    questionText: "Which course are you interested in?",
+    options: [
+      { text: "B.Tech", nextQuestionId: null },
+      { text: "MBA", nextQuestionId: null },
+      { text: "Pharmacy", nextQuestionId: null },
+    ]
+  });
+  q1.options[0].nextQuestionId = q2._id; // "Admission Process" leads to q2
+  await q1.save();
+
+  console.log("Database Seeded!");
   mongoose.connection.close();
 };
+// const seedFAQs = async () => {
+//   await FAQ.deleteMany({});
+//   await FAQ.create([
+//     { question: 'What is the admission fee?', answer: '$500 per semester.' },
+//     { question: 'How to apply?', answer: 'Visit the college website and fill the form.' },
+//   ]);
+//   console.log('FAQs seeded');
+//   mongoose.connecxtion.close();
+// };
 
-seedFAQs();
+// seedFAQs();
+seedQuestions();  
+

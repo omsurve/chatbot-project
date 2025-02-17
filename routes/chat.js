@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const Question = require('../models/Question');
+
 
 
 router.post('/', (req, res) => {
@@ -24,5 +26,27 @@ router.post('/ask', async (req, res) => {
   }
 });
 
+// Route to get a question by ID
+router.get('/question/:id', async (req, res) => {
+  try {
+    const question = await Question.findById(req.params.id);
+    if (!question) {
+      return res.json({ error: "Question not found." });
+    }
+    res.json(question);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Route to get the first question
+router.get('/question', async (req, res) => {
+  try {
+    const question = await Question.findOne(); // Get first question
+    res.json(question);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 module.exports = router;

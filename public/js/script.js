@@ -38,42 +38,75 @@ document.getElementById('send-btn').addEventListener('click', async () => {
     messagesDiv.appendChild(userMessage);
     messagesDiv.appendChild(botMessage);
   };
-  document.addEventListener('DOMContentLoaded', () => {
-    const chatForm = document.querySelector('#chat-form'); // Replace with your form ID
-    const chatInput = document.querySelector('#chat-input'); // Replace with your input ID
-    const chatOutput = document.querySelector('#chat-output'); // Replace with your output container ID
+//   document.addEventListener('DOMContentLoaded', () => {
+//     const chatForm = document.querySelector('#chat-form'); // Replace with your form ID
+//     const chatInput = document.querySelector('#chat-input'); // Replace with your input ID
+//     const chatOutput = document.querySelector('#chat-output'); // Replace with your output container ID
 
-    chatForm.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Prevent page reload
-        const question = chatInput.value.trim();
+//     chatForm.addEventListener('submit', async (e) => {
+//         e.preventDefault(); // Prevent page reload
+//         const question = chatInput.value.trim();
 
-        if (!question) {
-            chatOutput.innerHTML = 'Please ask a question.';
-            return;
-        }
+//         if (!question) {
+//             chatOutput.innerHTML = 'Please ask a question.';
+//             return;
+//         }
 
-        // Send the question to the server
-        try {
-            const response = await fetch('/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ question }),
-            });
+//         // Send the question to the server
+//         try {
+//             const response = await fetch('/chat', {
+//                 method: 'POST',
+//                 headers: {
+//                     'Content-Type': 'application/json',
+//                 },
+//                 body: JSON.stringify({ question }),
+//             });
 
-            const data = await response.json();
-            if (data.answer) {
-                chatOutput.innerHTML = data.answer;
-            } else {
-                chatOutput.innerHTML = 'No response available.';
-            }
-        } catch (error) {
-            chatOutput.innerHTML = 'Error connecting to server.';
-            console.error(error);
-        }
+//             const data = await response.json();
+//             if (data.answer) {
+//                 chatOutput.innerHTML = data.answer;
+//             } else {
+//                 chatOutput.innerHTML = 'No response available.';
+//             }
+//         } catch (error) {
+//             chatOutput.innerHTML = 'Error connecting to server.';
+//             console.error(error);
+//         }
+//     });
+// });
+
+document.addEventListener("DOMContentLoaded", async function () {
+  const chatbox = document.getElementById("chatbox");
+
+  // Function to fetch and display a question
+  async function fetchQuestion(questionId = "") {
+    let url = `/chat/question${questionId ? `/${questionId}` : ""}`;
+    let response = await fetch(url);
+    let data = await response.json();
+
+    if (data.error) {
+      chatbox.innerHTML += `<p>${data.error}</p>`;
+      return;
+    }
+
+    // Display the question
+    chatbox.innerHTML += `<p>${data.questionText}</p>`;
+
+    // Display clickable options
+    data.options.forEach(option => {
+      let button = document.createElement("button");
+      button.innerText = option.text;
+      button.onclick = () => fetchQuestion(option.nextQuestionId);
+      chatbox.appendChild(button);
     });
+
+    chatbox.innerHTML += `<br>`; // Spacing
+  }
+
+  // Fetch and display the first question
+  fetchQuestion();
 });
+
 function sendMessage() {
     const userMessage = userInput.value.trim();
   
