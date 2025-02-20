@@ -10,16 +10,18 @@ const seed = require('./utils/seed');
 const chatRoutes = require('./routes/chat');
 dotenv.config(); // Load environment variables from .env
 
-console.log('MongoDB URI:', process.env.MONGO_URI);
-
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+console.log('MongoDB URI:', process.env.DB_URI);
+//Connecting with Database for First time
+try
+{
+  mongoose
+  .connect(process.env.DB_URI, {
   })
-  .then(() => console.log('Connected to Local MongoDB'))
-  .catch((err) => console.error('MongoDB connection error:', err));
-
+  console.log("Database is connnected!")
+}catch(error){
+  console.log("Database is failed to connect!")
+}
+  
 // Middleware to parse JSON data
 app.use(express.json());
 // Middleware to parse URL-encoded data

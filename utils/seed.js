@@ -2,12 +2,6 @@ const mongoose = require('mongoose');
 const FAQ = require('../models/faq');
 const Question = require('../models/Question.js');
 
-// mongoose.connect('mongodb://127.0.0.1:27017/chatbot');
-mongoose.connect('mongodb://localhost:27017/chatbotDB', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
 const seedQuestions = async () => {
   await Question.deleteMany(); // Clears old data
 
