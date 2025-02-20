@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Chatbot</title>
+    <link rel="stylesheet" href="/public/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">🎓 College Chatbot</div>
+
+        <div class="chat-window" id="chat-window">
+            <div class="bot-message">Hi! How can I help you today? 😊</div>
+            <div class="options">
+                <button class="option-btn" data-msg="Admission Process">Admission Process</button>
+                <button class="option-btn" data-msg="Courses Offered">Courses Offered</button>
+                <button class="option-btn" data-msg="Contact Details">Contact Details</button>
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type your message...">
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+
+    <script src="/public/script.js"></script>
+</body>
+</html>

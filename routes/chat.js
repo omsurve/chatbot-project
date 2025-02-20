@@ -1,52 +1,47 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Question = require('../models/Question');
+const Question = require("../models/Question");
+const axios = require('axios');
+const GEMINI_API_KEY = 'AIzaSyDCpGJmDZhTWZarLSliuC7johJicllNVs4';
 
 
+router.get("/generate-question", async (req, res) => {
+    try {
+        const question = await Question.aggregate([{ $sample: { size: 1 } }]);
+        if (!question.length) return res.json({ error: "No questions found!" });
 
-router.post('/', (req, res) => {
-  const { question } = req.body;
-
-  if (!question) {
-      return res.status(400).json({ error: 'Question is required' });
-  }
-
-  // Respond with some logic (e.g., AI response or FAQ)
-  res.json({ answer: `You asked: ${question}` });
-});
-
-router.post('/ask', async (req, res) => {
-  const { question } = req.body;
-  try {
-    const answer = await getBotResponse(question);
-    res.json({ answer });
-  } catch (error) {
-    console.error('Error with chatbot response:', error);
-    res.status(500).json({ answer: "Sorry, something went wrong. Please try again later." });
-  }
-});
-
-// Route to get a question by ID
-router.get('/question/:id', async (req, res) => {
-  try {
-    const question = await Question.findById(req.params.id);
-    if (!question) {
-      return res.json({ error: "Question not found." });
+        res.json({
+            text: question[0].text,
+            options: question[0].options,
+            answer: question[0].answer
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
     }
-    res.json(question);
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
-  }
+});
+router.post('/ask', async (req, res) => {
+    const userMessage = req.body.message;
+
+    try {
+        const geminiResponse = await axios.post(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
+            {
+                contents: [{ parts: [{ text: userMessage }] }]
+            },
+            {
+                headers: { 'Content-Type': 'application/json' }
+            }
+        );
+
+        const botReply = geminiResponse.data.candidates[0]?.content?.parts[0]?.text || "No response from Gemini.";
+
+        res.json({ reply: botReply, options: ["More Info", "Another Question"] });
+
+    } catch (error) {
+        console.error("🔥 Gemini API Error:", error.message);
+        res.status(500).json({ error: "Failed to fetch response from Gemini API" });
+    }
 });
 
-// Route to get the first question
-router.get('/question', async (req, res) => {
-  try {
-    const question = await Question.findOne(); // Get first question
-    res.json(question);
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
-  }
-});
 
 module.exports = router;

@@ -1,122 +1,74 @@
-const chatMessages = document.getElementById('chat-messages');
-const userInput = document.getElementById('user-input');
+$(document).ready(function () {
 
-
-document.getElementById('send-btn').addEventListener('click', async () => {
-    const input = document.getElementById('user-input').value;
-    const response = await fetch('/chat/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question: input }),
-    });
-    const data = await response.json();
-  
-    const messagesDiv = document.getElementById('messages');
-    const userMessage = document.createElement('div');
-    userMessage.textContent = `You: ${input}`;
-    const botMessage = document.createElement('div');
-    botMessage.textContent = `Bot: ${data.answer}`;
-    messagesDiv.appendChild(userMessage);
-    messagesDiv.appendChild(botMessage);
-  
-    document.getElementById('user-input').value = '';
-  });
-
-  const sendFAQ = async (question) => {
-    const response = await fetch('/chat/ask', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question }),
-    });
-    const data = await response.json();
-  
-    const messagesDiv = document.getElementById('messages');
-    const userMessage = document.createElement('div');
-    userMessage.textContent = `You: ${question}`;
-    const botMessage = document.createElement('div');
-    botMessage.textContent = `Bot: ${data.answer}`;
-    messagesDiv.appendChild(userMessage);
-    messagesDiv.appendChild(botMessage);
-  };
-  document.addEventListener('DOMContentLoaded', () => {
-    const chatForm = document.querySelector('#chat-form'); // Replace with your form ID
-    const chatInput = document.querySelector('#chat-input'); // Replace with your input ID
-    const chatOutput = document.querySelector('#chat-output'); // Replace with your output container ID
-
-    chatForm.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Prevent page reload
-        const question = chatInput.value.trim();
-
-        if (!question) {
-            chatOutput.innerHTML = 'Please ask a question.';
-            return;
+    // Send button click
+    $("#send-btn").click(function () {
+        let userInput = $("#user-input").val().trim();
+        if (userInput !== "") {
+            appendUserMessage(userInput);
+            $("#user-input").val("");
+            getBotResponse(userInput);
         }
+    });
 
-        // Send the question to the server
-        try {
-            const response = await fetch('/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ question }),
+    // Enter key to send
+    $("#user-input").keypress(function (e) {
+        if (e.which === 13) {
+            $("#send-btn").click();
+        }
+    });
+
+    // Option button click
+    $(document).on('click', '.option-btn', function () {
+        let userMsg = $(this).attr('data-msg');
+        appendUserMessage(userMsg);
+        getBotResponse(userMsg);
+    });
+
+    // Append user message
+    function appendUserMessage(msg) {
+        $("#chat-window").append(`<div class="user-message">${msg}</div>`);
+        scrollChatToBottom();
+    }
+
+    // Append bot message
+    function appendBotMessage(msg, options = []) {
+        let messageHTML = `<div class="bot-message">${msg}</div>`;
+        if (options.length > 0) {
+            messageHTML += '<div class="options">';
+            options.forEach(option => {
+                messageHTML += `<button class="option-btn" data-msg="${option}">${option}</button>`;
             });
-
-            const data = await response.json();
-            if (data.answer) {
-                chatOutput.innerHTML = data.answer;
-            } else {
-                chatOutput.innerHTML = 'No response available.';
-            }
-        } catch (error) {
-            chatOutput.innerHTML = 'Error connecting to server.';
-            console.error(error);
+            messageHTML += '</div>';
         }
-    });
+        $("#chat-window").append(messageHTML);
+        scrollChatToBottom();
+    }
+
+    // Bot response simulation
+    function getBotResponse(userInput) {
+        $.ajax({
+            url: "http://localhost:3000/chat/ask", // Ensure this matches your backend route
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ message: userInput }), // Correct key name 'message'
+            success: function (response) {
+                let botMessage = response.reply || "Sorry, I couldn't fetch a response.";
+                let options = response.options || []; 
+                appendBotMessage(botMessage, options);
+            },
+            error: function (err) {
+                appendBotMessage("⚠️ Error fetching response. Please try again.");
+                console.error("Error:", err);
+            }
+        });
+    }
+    
+    
+
+    // Scroll chat to bottom
+    function scrollChatToBottom() {
+        let chatWindow = $("#chat-window");
+        chatWindow.scrollTop(chatWindow.prop("scrollHeight"));
+    }
+
 });
-function sendMessage() {
-    const userMessage = userInput.value.trim();
-  
-    if (!userMessage) return;
-  
-    // Display the user's message
-    appendMessage(userMessage, 'user');
-  
-    // Send the message to the bot
-    fetch('/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ question: userMessage }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        // Display the bot's response
-        appendMessage(data.answer, 'bot');
-      })
-      .catch((error) => {
-        appendMessage('Sorry, something went wrong. Please try again.', 'bot');
-        console.error('Error:', error);
-      });
-  
-    // Clear the input field
-    userInput.value = '';
-  }
-  
-  // Function to append messages to the chat
-  function appendMessage(message, sender) {
-    const messageElement = document.createElement('div');
-    messageElement.classList.add('message', sender);
-  
-    const bubbleElement = document.createElement('div');
-    bubbleElement.classList.add('bubble');
-    bubbleElement.textContent = message;
-  
-    messageElement.appendChild(bubbleElement);
-    chatMessages.appendChild(messageElement);
-  
-    // Scroll to the bottom
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  }
-  
