@@ -51,6 +51,7 @@
 .user-message {
   background-color: #4CAF50;
   color: white;
+  margin: 10px 0 0px 95px;
   align-self: flex-end;
 }
 
